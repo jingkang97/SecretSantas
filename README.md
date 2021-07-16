@@ -100,14 +100,14 @@ This project is distinct and more complicated from all previous projects because
         
 ### How to run the application 
 1. Install Django if it was not installed by running:
-    ```pip install -r requirements.txt
-2.  ```python3 manage.py makemigrations
-3. ```python3 manage.py migrate
-4. ```python3 manage.py runserver
+    `pip install -r requirements.txt`
+2.  `python3 manage.py makemigrations`
+3. `python3 manage.py migrate`
+4. `python3 manage.py runserver`
 
 #### Adding superuser to have admin access (optional)
 
-1. ```python3 manage.py createsuperuser
+1. `python3 manage.py createsuperuser`
 2. Add username, email and password
 
 
