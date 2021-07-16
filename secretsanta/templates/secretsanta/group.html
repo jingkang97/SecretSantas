@@ -1,0 +1,421 @@
+{% extends "secretsanta/layout.html" %}
+
+
+{% load static %}
+
+
+{% block body %}
+	
+	
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+   
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+
+
+
+    {% if alerts %}
+		{% for alert in alerts %}
+			{% if not alert.read %}
+			<div class="alert alert-warning alert-dismissible fade show" role="alert">
+			  <strong>{{alert.message}}</strong> 
+			  <button onclick="read('{{alert.id}}')" type="button" class="close read" data-dismiss="alert" aria-label="Close">
+			    <span aria-hidden="true">&times;</span>
+			  </button>
+			</div>
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+
+	<div id="group_background" style="padding: 30px; background-repeat: no-repeat; background-image:url('{% static "secretsanta/background.svg" %}');">
+		<div id = "group_container" style="" >
+			<div style="display: flex; flex-direction: row; justify-content:flex-end; ">
+				
+					
+				
+				
+				{% if user.username != group.organiser.username%}
+					<button type="button" class="btn btn-danger" style="border-radius: 10px; "
+					onclick="location.href='{% url 'leave_group' group.pk %}'"
+					>
+						Leave Group
+					</button>
+				{% else %}
+					<button type="button" class="btn btn-danger" style="border-radius: 10px;"
+					onclick="location.href='{% url 'delete_group' group.pk %}'"
+					>
+						Delete Group
+					</button>
+
+				{% endif %}
+			</div>
+			<div style="margin-bottom: -80px; color: white; display: flex; justify-content: center; padding: 60px; background-size: 400px; background-position: bottom; background-repeat: no-repeat; background-image: url('{% static "secretsanta/banner.svg" %}');">
+				<h1 id = "group_title" value={{group.title}}>
+					{{group.title}}
+				</h1>
+			</div>
+			
+			<div class="shadow"  style="display: flex; flex-direction: column; padding: 20px; border-radius: 20px; margin-top: 30px;">
+				<div style="border-left: 20px dotted lightgrey; padding-left: 30px; padding-top: 20px; padding-right: 20px; ">
+				
+				
+				<div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+					<h2>
+						Group details
+					</h2>
+					{% if group.organiser == user %}
+					<button type="button" class="btn btn-outline-danger" style="border-radius: 10px;" data-toggle="collapse" data-target="#edit_container" aria-expanded="true" aria-controls="edit_container" onclick="show()">
+						Edit
+					</button>
+					{% endif %}
+
+				</div>
+
+					
+					<div style="display: flex; flex-direction: row; margin-bottom: 20px;">
+						<div style="display: flex; flex-direction: column; justify-content: space-evenly; margin-right: 30px; width: 20px">
+							<h5 style="color: #D9524F;">
+								<i class="fas fa-users"></i>
+							</h5>
+							
+						</div>
+						<div>
+							<h6 style="color: grey;">
+								ORGANISER
+							</h6>
+							<h4 id="group_organiser" value={{group.organiser.username}}>
+								{{group.organiser.username}}
+							</h4>
+						</div>
+						
+					</div>
+					
+
+
+					<div style="display: flex; flex-direction: row; margin-bottom: 20px;">
+						<div style="display: flex; flex-direction:column; justify-content: space-evenly; text-align: center; margin-right: 30px; width: 20px;">
+							<h4 style="color: #D9524F;">
+								<i class="fas fa-calendar-day"></i>
+							</h4>
+							
+						</div>
+						<div>
+							<h6 style="color: grey;">
+								EXCHANGE DATE
+							</h6>
+							<h4 id="exchangeDate" value={{exchange_date}}>
+								{{group.exchange_date|date:'d M Y' }}
+								
+							</h4>
+						</div>
+						
+					</div>
+
+
+
+
+
+					<div style="display: flex; flex-direction: row; margin-bottom: 20px;">
+						<div style="display: flex; flex-direction: column; justify-content: space-evenly; text-align: center; margin-right: 30px; width: 20px; ">
+							<h4 style="color: #D9524F;">
+								<i class="far fa-sticky-note"></i>
+							</h4>
+							
+						</div>
+						<div>
+							<h6 style="color: grey;">
+								NOTE
+							</h6>
+							<h4 id="note" value={{group.note}}>
+								{{group.note}}
+							</h4>
+						</div>
+						
+					</div>
+
+
+					<div style="display: flex; flex-direction: row; margin-bottom: 20px;">
+						<div style="display: flex; flex-direction: column; justify-content: space-evenly; text-align: center; margin-right: 30px; width: 20px; ">
+							<h4 style="color: #D9524F;">
+								<i class="fas fa-dollar-sign"></i>
+							</h4>
+							
+						</div>
+						<div>
+							<h6 style="color: grey;">
+								BUDGET
+							</h6>
+							<h4 id="budget" value={{group.budget}}>
+								$ {{group.budget}}
+							</h4>
+						</div>
+						
+					</div>
+
+
+
+
+					
+					<h3 style="color: #D9524F">Participants </h3>
+				
+				<div>
+					<h4>
+						{% for member in group.members.all %}
+							{% if member.username != group.organiser.username %}
+							<li style="margin-bottom: 10px;">
+								{{member.username}}
+							</li>
+							
+							{% endif %}
+						{% endfor %}
+					</h4>
+					
+				</div>
+
+				<div id="edit_container" class="collapse" style="margin-top: 30px;">
+					
+					<hr>
+					<br>
+					<h3>
+						Edit Details
+					</h3>
+
+					<br>
+					<form id="edit_form" action="{% url 'edit' group.pk %}" method="post">
+						{% csrf_token %}
+					<h4 style="color: #D9524F">Group Name</h4> 
+					<input name="group_name" id="edit-group-name" value={{group.title}} style = "width: 250px; margin-bottom: 10px;" name="input" type="text" class="form-control names" placeholder="Enter member" aria-label="" aria-describedby="basic-addon1">
+					
+
+					<h4 style="color: #D9524F">Exchange Date</h4> 
+
+					<div style="margin-bottom: 10px">
+						
+					  <input name="exchange_date" id = "edit-exchange-date" value={{exchange_date}} style="width: 250px" name="date" type="date" class="form-control  edit" id="datepicker" placeholder="MM/DD/YYYY" style="cursor:pointer" >
+						
+					</div>
+
+					<h4 style="color: #D9524F">Budget</h4> 
+
+					<div class="input-group mb-3" style="width: 250px">
+  						<div class="input-group-prepend">
+    						<span class="input-group-text">$</span>
+  						</div>
+  						<input name="budget" id="edit-budget" value={{group.budget}} name="budget" type="number" step=".01" class="form-control edit" aria-label="Amount (to the nearest dollar)">
+  
+					</div>
+
+					<h4 style="color: #D9524F">Note</h4> 
+					
+					<textarea name="note" class="form-control message" id="edit-note" rows="3" placeholder="Write a message" style="margin-bottom: 20px">{{group.note}}</textarea>
+
+
+
+					<h4 style="color: #D9524F">Participants </h4>
+
+					<div id="name_list" >
+					<div class="input-group mb-3">
+				  		<input id="add_name" name="input" type="text" class="form-control names" placeholder="Enter member" aria-label="Enter member" aria-describedby="basic-addon2">
+				  		<div class="input-group-append">
+				    		<button class="btn btn-danger" type="button" onclick="add()">+</button>
+				  		</div>
+					</div>
+				</div>
+
+					<div id = "participants">
+					{% for member in group.members.all %}
+					{% if member == user %}
+					{% else %}
+					
+					<span name="mem" class="badge badge-pill badge-danger mem-edit" style="padding: 5px; margin-left: 5px;">{{member.username}}
+						<button type="button" class="astext" style="background:none; border:none; padding:0;cursor: pointer; color: white; font-weight: bold;" onclick="return remove_pill(this)">
+							<input class="memb" style="display:none;" type="text" name="mem" value={{member.username}}>
+							<div>&times;</div>
+						</button>
+					</span>
+					{% endif %}
+					{% endfor %}
+					</div>
+					<div style="margin-top: 30px">
+						
+						<input class="btn btn-danger" style="margin-right: 10px;" type="submit" value="Confirm">
+
+						<button class="btn btn-outline-danger" data-toggle="collapse" data-target="#edit_container" aria-expanded="true" aria-controls="edit_container" onclick="return show()" type="button">
+						Cancel
+						</button>
+					</div>
+					
+				</form>
+				</div>
+				
+			</div>
+			</div>
+			
+			{% if group.members.all|length < 3 %}
+			<div style="margin-top: 50px;">
+				<h5>
+					Not enough members in the group! Please add more members!
+				</h5>
+			</div>
+				
+			
+
+			{% elif not group.shuffled %}
+			
+			{% if group.organiser == user %}
+			<div style="display: flex; justify-content: center; text-align: center; flex-direction: column; margin-top: 50px">
+				<h5>
+					Press the button below to shuffle the names and see your secret giftee!
+				</h5>
+				<div style="margin-top: 10px">
+					<button type="button" class="btn btn-danger" style="border-radius: 15px;padding: 30px; padding-top: 20px; height: 80px; border: 2px dotted gold; color: gold;"
+						onclick="location.href='{% url 'shuffle' group.pk %}'">
+
+						<h3>Shuffle <i class="fas fa-dice"></i></h3>
+						
+					</button>
+					
+					
+				</div>
+
+			</div>
+			{% else %}
+			<div style="margin-top: 50px">
+				<h4>
+					Please wait for the organiser to shuffle the names!
+				</h4>
+			</div>
+			{% endif %}
+
+
+
+			
+			{% else %}
+			
+
+			<div style="width: 100%; margin-top: 50px; display: flex; flex-direction: row; justify-content: center; text-align: center;">
+				<h4>
+					<div style="margin-bottom: 10px">
+						You are the secret santa of: 
+					</div>
+					{% for wish in wishlist %}
+					<div style="width: 100%;">
+						{% if wish.gifter == user%}
+						<div style="width: 100%">
+							<div style="margin: 10px; display: flex; justify-content: center; align-content: center; text-align: center; padding: 50px; background-position: center; background-size: 250px ; background-repeat: no-repeat; background-image: url('{% static "secretsanta/_Group_.svg" %}'); color: white; ">
+								<div>
+									<h3>
+										{{wish.giftee.username}}
+									</h3>
+									
+								</div> 
+
+								
+							</div>
+							
+						</div>
+					</div>
+				</h4>	
+			</div>
+
+
+
+
+						
+
+
+
+
+
+
+
+						<div class="shadow" style=" border-radius: 20px; width: 100%;">
+							<div style="display: flex; flex-direction: row; background-color: #D9524F; border-top-right-radius: 20px; border-top-left-radius: 20px; height: 100px; justify-content: center; text-align: center; color: white; align-content: center; align-items: center;">
+								<h2>
+								WishList ({{wish.gifts.all|length}})
+								</h2>
+							</div>
+							
+
+							<div id="body">
+
+								<div id="notes" style="padding: 30px;">
+									<h4>Notes: </h4>
+									{% if wish.note|length == 0 %}
+										<h5 style="padding: 10px; color: grey;">
+											No notes yet!
+										</h5>
+										
+									{% else %}
+									<h5 style="color: grey">
+										{{wish.note}}
+									</h5>
+										
+									{% endif %}
+								</div>
+								<div style="padding-left: 20px; padding-right: 20px;">
+									<hr>
+								</div>
+								
+
+								<div style="padding: 20px;">
+									{% for gift in wish.gifts.all %}
+
+										<div style="display: flex; flex-direction: row; margin: 20px; border-radius: 20px; justify-content: space-between;" class="shadow">
+											<div>
+												<img style="border-bottom-left-radius: 20px; border-top-left-radius: 20px; height: 200px; width: 200px;" src="{{gift.image_url}}">
+											</div>
+											<div style="display: flex; flex-direction: column; justify-content: center; text-align: center; width: 100%;">
+												<div>
+													<h4 style="color: grey">
+														{{gift.title}}
+													</h4>
+												
+												</div>
+												
+												<div>
+													<h2>
+														$ {{gift.price}}
+													</h2>
+													
+												</div>
+											</div>
+											
+
+
+										</div>
+
+									{% endfor %}
+								</div>
+
+
+							</div>
+						</div>
+						
+			{% endif %}
+			</div>
+			{% endfor %}
+			
+			
+			
+			{% endif %}
+	</div>
+
+
+
+	{% block script %}
+		
+    	<script src="{% static 'secretsanta/alert.js' %}"></script>
+    	<script src="{% static 'secretsanta/edit.js' %}"></script>
+
+	{% endblock %}
+	
+
+{% endblock %}

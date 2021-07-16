@@ -1,0 +1,728 @@
+{% extends "secretsanta/layout.html" %}
+
+{% load static %}
+
+{% block body %}
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+   
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- <script src="static/secretsanta/browse.js" type="text/javascript"></script> -->
+
+
+
+
+    <div style="padding: 30px;">
+    	<div style="min-height: 50px;">
+		<h1>
+			Browse
+		</h1>
+		<h5>Add gifts to your wishlist!</h5>
+		</div>
+
+	</div>
+
+
+<div style="display: none">
+            	<div id="user" value="{{user.id}}">
+            		{{user.id}}
+            	</div>
+            	<div id="likes">
+            		{% for like in likes %}
+	            	<div id="{{like.user.id}}-{{like.gift.id}}-{{like.group.id}}" value="{{like.user.id}}-{{like.gift.id}}-{{like.group.id}}"
+	            	user="{{like.user.id}}"
+	            	gift="{{like.gift.id}}"
+	            	group="{{like.group.id}}"	
+	            	>
+	            	</div>
+	            	{% endfor %}
+            	</div>
+            	
+            </div>
+
+
+
+	<div>
+
+
+	{% if shuff|length == 0 and groups|length > 0 %}
+		<div id="no_shuffle_page" style="display: flex; flex-direction: column; justify-content: center; min-height: 400px; align-content: center; width: 405" >
+			<div style="display: flex; flex-direction: column; justify-content: center; text-align: center;">
+				<h5>
+					Groups formed but none shuffled yet.
+				</h5> 
+				<h5>
+					Click <a href="{% url 'groups' %}" class="text-danger" style="text-decoration: none;">here</a> or the groups tab to choose group and shuffle! 
+				</h5>
+				<h5>
+					(Shuffling can only be done by group organiser!)
+				</h5>
+			</div>
+			<div style="display: flex; justify-content: center;">
+				<div  style="height: 500px; width: 50%; margin-bottom: 0px ">
+				{% include "secretsanta/no_wishlist.html" %}
+				</div>
+			</div>
+			
+			
+		</div>
+
+	{% endif %}
+
+
+	{% if shuff|length >= 1 and groups|length != 0%}
+	
+	<h5 style="margin-left: 30px">Select your group</h5>
+
+	<div style="display: flex; flex-direction: row; justify-content: flex-start; padding-left: 30px; padding-bottom: 20px;">
+		
+
+		
+
+			{% for group in groups %}
+			{% if forloop.first %}
+				{% if group.shuffled%}
+			<div class="custom-control custom-radio custom-control-inline">
+			  <input type="radio" id="{{group.title}}radio" name="rd" class="custom-control-input" checked value="{{group.title}}" onclick="show_group('{{group.title}}')">
+			  <label class="custom-control-label red" for="{{group.title}}radio">{{group.title}}</label>
+			</div>
+
+				{% endif %}
+					  {% else %}
+					  {% if group.shuffled %}
+					  <div class="custom-control custom-radio custom-control-inline">
+			  <input type="radio" id="{{group.title}}radio" name="rd" class="custom-control-input" value="{{group.title}}" onclick="show_group('{{group.title}}')">
+			  <label class="custom-control-label red" for="{{group.title}}radio">{{group.title}}</label>
+			</div>
+			{% endif %}
+		  {% endif %}
+		
+
+		
+		{% endfor %}
+	</div>
+	
+
+	<div id="browse_main" style="">
+
+
+
+		<!-- click radio button to show the groups -->
+		{% for group in groups %}
+
+		<div id="{{group.title}}" class="shadow group tabs_page" style="">
+     
+        <nav>
+
+            <div class="nav nav-tabs" id="nav-tab" role="tablist" style="padding-left: 10px ;" >
+
+            	
+            	
+                <a class="nav-item nav-link active text-secondary" id="nav-home-tab-{{group.title}}" data-toggle="tab" href="#nav-home-{{group.title}}" role="tab" aria-controls="nav-home-{{group.title}}" aria-selected="true" style="border-top-left-radius: 10px; border-top-right-radius: 10px;">All Gifts</a>
+                {% for cat in categories %}
+                {% ifnotequal cat|stringformat:"s" "General" %}
+                <a class="nav-item nav-link text-secondary" id="nav-{{cat}}-tab-{{group.title}}" data-toggle="tab" href="#nav-{{cat}}-{{group.title}}" role="tab" aria-controls="nav-{{cat}}-{{group.title}}" aria-selected="false" style="border-top-left-radius: 10px; border-top-right-radius: 10px;">{{cat}}</a>
+                {% endifnotequal %}
+
+                {% endfor %}
+
+            </div>
+        </nav>
+        
+
+
+
+        <div class="tab-content" id="nav-tabContent">
+        	
+            <div class="tab-pane fade show active tabs_ind" id="nav-home-{{group.title}}" role="tabpanel" aria-labelledby="nav-home-tab-{{group.title}}" style="">
+            	
+            		
+		            <div class="container">
+            		{% for gift in gifts %}
+
+            		{% if forloop.first %}
+					  <div class="row" style="padding-top: 20px;">
+					  	{% endif %}
+					  		
+					  		<div class="col-md-4" style="margin-bottom: 20px;">
+					    	<div class = "panel panel-default shadow" style="min-height: 100%; min-width: 100%; max-width: 100%; border-radius: 20px; ">
+							   <div class = "panel-heading">
+							      <div class = "panel-title" style="color: white; border-top-right-radius: 20px; border-top-left-radius: 20px;">
+							         <img id="{{gift.id}}-image" src={{gift.image_url}} value="{{gift.image_url}}"style="max-height: 200px; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+							      </div>
+							      
+							   </div>
+							   <div style="display: flex; flex-direction: row; justify-content: flex-end; margin-top: -22px; z-index: 1px;">
+							   		<div class="shadow" style="display: flex; border-radius: 100px; justify-content: center; width: 50px; height: 50px; align-items: center; background-color: white; margin-right: 10px;">
+
+
+
+									   <i id="like-btn-{{gift.id}}-{{group.id}}" onclick="like('{{gift.id}}','{{group.id}}' )" data-liked="false" class="fa fa-heart love like-btn-{{gift.id}}-{{group.id}}" style="color: white;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: red;
+									   cursor:pointer; font-size: 20px;"
+									   gift="{{gift.id}}"
+									   group="{{group.id}}"
+
+									   ></i>
+
+									   
+							   			
+							   		</div>
+							   </div>
+							   
+
+
+							   
+							   <div class = "panel-body" style="padding-left: 20px; padding-right: 20px; padding-bottom: 20px; padding-top: 10px">
+							    	<div style="height: 50px;">
+							    		<div id="{{gift.id}}-title" value="{{gift.title}}"style="color:grey;">
+							   			{{gift.title}}
+							   			</div>
+							    	</div>
+							   		
+							   		<div style="display: flex; flex-direction: row; justify-content: space-between;">
+							   			
+							   			<h5 id="{{gift.id}}-price" value="{{gift.price}}" style="font-size: 20px;">
+							   			${{gift.price}}
+							   			</h5>
+
+							   			<h5 style="display: flex; flex-direction: row; justify-content: center; text-align: center; align-content: center; ">
+							   				<i   data-liked="false" class="fa fa-heart" style="color: grey;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: grey;
+									   margin-right: 5px; margin-top: 3px;"></i> 
+
+
+
+									   	<div id="likes-{{gift.id}}-{{group.id}}" class="likes-{{gift.id}}" >{{gift.likes}}</div>
+
+							   			</h5>
+							      
+							   		</div>
+							      
+							   </div>
+							</div>
+					    	</div>
+
+
+					  {% if forloop.counter|divisibleby:3 %}</div><div class="row" style="padding-top: 20px;">{% endif %}
+					  {% if forloop.last %}
+
+					  </div>
+					  {% endif %}
+					  {% endfor %}
+				</div>
+                
+            </div>
+
+
+
+
+            
+
+
+
+
+
+
+
+            <div class="tab-pane fade tabs_ind" id="nav-Toys-{{group.title}}" role="tabpanel" aria-labelledby="nav-Toys-tab-{{group.title}}" style="">
+                <div class="container">
+            		{% for gift in toys %}
+
+            		{% if forloop.first %}
+					  <div class="row" style="padding-top: 20px;">
+					  	{% endif %}
+					  		
+					  		<div class="col-md-4" style="margin-bottom: 20px;">
+					    	<div class = "panel panel-default shadow" style="min-height: 100%; min-width: 100%; max-width: 100%; border-radius: 20px; ">
+							   <div class = "panel-heading">
+							      <div class = "panel-title" style="color: white; border-top-right-radius: 20px; border-top-left-radius: 20px;">
+							         <img src={{gift.image_url}} style="max-height: 200px; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+							      </div>
+							      
+							   </div>
+							   <div style="display: flex; flex-direction: row; justify-content: flex-end; margin-top: -22px; z-index: 1px;">
+							   		<div class="shadow" style="display: flex; border-radius: 100px; justify-content: center; width: 50px; height: 50px; align-items: center; background-color: white; margin-right: 10px;">
+							   		
+
+							   		
+
+									   <i id="like-btn-{{gift.id}}-{{group.id}}" onclick="like('{{gift.id}}','{{group.id}}' )" data-liked="false" class="fa fa-heart love like-btn-{{gift.id}}-{{group.id}}" style="color: white;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: red;
+									   cursor:pointer; font-size: 20px;"
+									   gift="{{gift.id}}"
+									   group="{{group.id}}"
+									   ></i>
+
+									   
+							   		</div>
+							   </div>
+							   
+
+
+							   
+							   <div class = "panel-body" style="padding-left: 20px; padding-right: 20px; padding-bottom: 20px; padding-top: 10px">
+							    	<div style="height: 50px;">
+							    		<h6 style="color:grey;">
+							   			{{gift.title}}
+							   			</h6>
+							    	</div>
+							   		
+							   		<div style="display: flex; flex-direction: row; justify-content: space-between;">
+							   			
+							   			<h5>
+							   			${{gift.price}}
+							   			</h5>
+
+							   			<h5 style="display: flex; flex-direction: row; justify-content: center; text-align: center; align-content: center; ">
+							   				<i   data-liked="false" class="fa fa-heart" style="color: grey;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: grey;
+									   margin-right: 5px; margin-top: 3px;"></i> 
+
+									   	<div id="likes-{{gift.id}}-{{group.id}}" class="likes-{{gift.id}}" >{{gift.likes}}</div>
+
+							   			</h5>
+							      
+							   		</div>
+							   		
+							   </div>
+							</div>
+					    	</div>
+
+
+					  {% if forloop.counter|divisibleby:3 %}</div><div class="row" style="padding-top: 20px;">{% endif %}
+					  {% if forloop.last %}
+
+					  </div>
+					  {% endif %}
+					  {% endfor %}
+				</div>
+            </div>
+
+
+
+            <div class="tab-pane fade tabs_ind" id="nav-Electronics-{{group.title}}" role="tabpanel" aria-labelledby="nav-Electronics-tab-{{group.title}}" style="">
+                <div class="container">
+            		{% for gift in electronics %}
+
+            		{% if forloop.first %}
+					  <div class="row" style="padding-top: 20px;">
+					  	{% endif %}
+					  		
+					  		<div class="col-md-4" style="margin-bottom: 20px;">
+					    	<div class = "panel panel-default shadow" style="min-height: 100%; min-width: 100%; max-width: 100%; border-radius: 20px; ">
+							   <div class = "panel-heading">
+							      <div class = "panel-title" style="color: white; border-top-right-radius: 20px; border-top-left-radius: 20px;">
+							         <img src={{gift.image_url}} style="max-height: 200px; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+							      </div>
+							      
+							   </div>
+							   <div style="display: flex; flex-direction: row; justify-content: flex-end; margin-top: -22px; z-index: 1px;">
+							   		<div class="shadow" style="display: flex; border-radius: 100px; justify-content: center; width: 50px; height: 50px; align-items: center; background-color: white; margin-right: 10px;">
+							   		
+									   <i id="like-btn-{{gift.id}}-{{group.id}}" onclick="like('{{gift.id}}','{{group.id}}' )" data-liked="false" class="fa fa-heart love like-btn-{{gift.id}}-{{group.id}}" style="color: white;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: red;
+									   cursor:pointer; font-size: 20px;"
+									   gift="{{gift.id}}"
+									   group="{{group.id}}"
+									   ></i>
+
+							   		</div>
+							   </div>
+							   
+
+
+							   
+							   <div class = "panel-body" style="padding-left: 20px; padding-right: 20px; padding-bottom: 20px; padding-top: 10px">
+							    	<div style="height: 50px;">
+							    		<h6 style="color:grey;">
+							   			{{gift.title}}
+							   			</h6>
+							    	</div>
+							   		
+							   		<div style="display: flex; flex-direction: row; justify-content: space-between;">
+							   			
+							   			<h5>
+							   			${{gift.price}}
+							   			</h5>
+
+							   			<h5 style="display: flex; flex-direction: row; justify-content: center; text-align: center; align-content: center; ">
+							   				<i   data-liked="false" class="fa fa-heart" style="color: grey;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: grey;
+									   margin-right: 5px; margin-top: 3px;"></i> 
+
+									   	<div id="likes-{{gift.id}}-{{group.id}}" class="likes-{{gift.id}}" >{{gift.likes}}</div>
+
+							   			</h5>
+							      
+							   		</div>
+							      
+							   </div>
+							</div>
+					    	</div>
+
+
+					  {% if forloop.counter|divisibleby:3 %}</div><div class="row" style="padding-top: 20px;">{% endif %}
+					  {% if forloop.last %}
+
+					  </div>
+					  {% endif %}
+					  {% endfor %}
+				</div>
+            </div>
+
+
+
+
+
+
+            <div class="tab-pane fade tabs_ind" id="nav-Fashion-{{group.title}}" role="tabpanel" aria-labelledby="nav-Fashion-tab{{group.title}}" style="">
+                <div class="container">
+            		{% for gift in fashion %}
+
+            		{% if forloop.first %}
+					  <div class="row" style="padding-top: 20px;">
+					  	{% endif %}
+					  		
+					  		<div class="col-md-4" style="margin-bottom: 20px;">
+					    	<div class = "panel panel-default shadow" style="min-height: 100%; min-width: 100%; max-width: 100%; border-radius: 20px; ">
+							   <div class = "panel-heading">
+							      <div class = "panel-title" style="color: white; border-top-right-radius: 20px; border-top-left-radius: 20px;">
+							         <img src={{gift.image_url}} style="max-height: 200px; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+							      </div>
+							      
+							   </div>
+							   <div style="display: flex; flex-direction: row; justify-content: flex-end; margin-top: -22px; z-index: 1px;">
+							   		<div class="shadow" style="display: flex; border-radius: 100px; justify-content: center; width: 50px; height: 50px; align-items: center; background-color: white; margin-right: 10px;">
+							   		
+
+									   <i id="like-btn-{{gift.id}}-{{group.id}}" onclick="like('{{gift.id}}','{{group.id}}' )" data-liked="false" class="fa fa-heart love like-btn-{{gift.id}}-{{group.id}}" style="color: white;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: red;
+									   cursor:pointer; font-size: 20px;"
+									   gift="{{gift.id}}"
+									   group="{{group.id}}"
+									   ></i>
+
+							   		</div>
+							   </div>
+							   
+
+
+							   
+							   <div class = "panel-body" style="padding-left: 20px; padding-right: 20px; padding-bottom: 20px; padding-top: 10px">
+							    	<div style="height: 50px;">
+							    		<h6 style="color:grey;">
+							   			{{gift.title}}
+							   			</h6>
+							    	</div>
+							   		
+							   		<div style="display: flex; flex-direction: row; justify-content: space-between;">
+							   			
+							   			<h5>
+							   			${{gift.price}}
+							   			</h5>
+
+							   			<h5 style="display: flex; flex-direction: row; justify-content: center; text-align: center; align-content: center; ">
+							   				<i   data-liked="false" class="fa fa-heart" style="color: grey;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: grey;
+									   margin-right: 5px; margin-top: 3px;"></i> 
+
+									   	<div id="likes-{{gift.id}}-{{group.id}}" class="likes-{{gift.id}}" >{{gift.likes}}</div>
+
+							   			</h5>
+							      
+							   		</div>
+							      
+							   </div>
+							</div>
+					    	</div>
+
+
+					  {% if forloop.counter|divisibleby:3 %}</div><div class="row" style="padding-top: 20px;">{% endif %}
+					  {% if forloop.last %}
+
+					  </div>
+					  {% endif %}
+					  {% endfor %}
+				</div>
+            </div>
+
+
+
+            <div class="tab-pane fade tabs_ind" id="nav-Food-{{group.title}}" role="tabpanel" aria-labelledby="nav-Food-tab-{{group.title}}" style="">
+                <div class="container">
+            		{% for gift in food %}
+
+            		{% if forloop.first %}
+					  <div class="row" style="padding-top: 20px;">
+					  	{% endif %}
+					  		
+					  		<div class="col-md-4" style="margin-bottom: 20px;">
+					    	<div class = "panel panel-default shadow" style="min-height: 100%; min-width: 100%; max-width: 100%; border-radius: 20px; ">
+							   <div class = "panel-heading">
+							      <div class = "panel-title" style="color: white; border-top-right-radius: 20px; border-top-left-radius: 20px;">
+							         <img src={{gift.image_url}} style="max-height: 200px; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+							      </div>
+							      
+							   </div>
+							   <div style="display: flex; flex-direction: row; justify-content: flex-end; margin-top: -22px; z-index: 1px;">
+							   		<div class="shadow" style="display: flex; border-radius: 100px; justify-content: center; width: 50px; height: 50px; align-items: center; background-color: white; margin-right: 10px;">
+							   		
+									   <i id="like-btn-{{gift.id}}-{{group.id}}" onclick="like('{{gift.id}}','{{group.id}}' )" data-liked="false" class="fa fa-heart love like-btn-{{gift.id}}-{{group.id}}" style="color: white;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: red;
+									   cursor:pointer; font-size: 20px;"
+									   gift="{{gift.id}}"
+									   group="{{group.id}}"
+									   ></i>
+
+									   
+							   		</div>
+							   </div>
+							   
+
+
+							   
+							   <div class = "panel-body" style="padding-left: 20px; padding-right: 20px; padding-bottom: 20px; padding-top: 10px">
+							    	<div style="height: 50px;">
+							    		<h6 style="color:grey;">
+							   			{{gift.title}}
+							   			</h6>
+							    	</div>
+							   		
+							   		<div style="display: flex; flex-direction: row; justify-content: space-between;">
+							   			
+							   			<h5>
+							   			${{gift.price}}
+							   			</h5>
+
+							   			<h5 style="display: flex; flex-direction: row; justify-content: center; text-align: center; align-content: center; ">
+							   				<i   data-liked="false" class="fa fa-heart" style="color: grey;
+									   -webkit-text-stroke-width: 1px;
+									   -webkit-text-stroke-color: grey;
+									   margin-right: 5px; margin-top: 3px;"></i> 
+
+									   	<div id="likes-{{gift.id}}-{{group.id}}" class="likes-{{gift.id}}" >{{gift.likes}}</div>
+
+							   			</h5>
+							      
+							   		</div>
+							      
+							   </div>
+							</div>
+					    	</div>
+
+
+					  {% if forloop.counter|divisibleby:3 %}</div><div class="row" style="padding-top: 20px;">{% endif %}
+					  {% if forloop.last %}
+
+					  </div>
+					  {% endif %}
+					  {% endfor %}
+				</div>
+            </div>
+
+
+
+
+           	
+            
+        </div>
+    
+
+
+    </div>
+    {% endfor %}
+
+
+
+    <div id="wishlist_page" class = "panel panel-default shadow" style="">
+	   <div class = "panel-heading">
+	      <div class = "panel-title" style="background-color: #DC3545; color: white; border-top-right-radius: 30px; border-top-left-radius: 30px; padding: 20px; ">
+	         <h3>Wishlist</h3>
+	         <h6 style="display:flex; flex-direction: row; justify-content: flex-start;">
+	         	<div id="wish_count" style="margin-right: 5px" value={{wish_count}}>
+	         		{{wish_count}} 
+	         	</div> 
+	         gift/s</h6>
+	      </div>
+	      
+	   </div>
+	   
+	   <div id="panel_body_page" class = "panel-body" style="">
+	    	
+
+	      
+	   	{% if wishlists|length < 1 %}
+	   		<div style="display: flex; justify-content: center; padding: 30px;">
+	   			No wishlist yet!
+	   		</div>
+
+	   	{% else %}
+
+	      
+	      {% for wishlist in wishlists %}
+	      	<div id="{{wishlist.group.id}}-wishlist">
+	      		<div style="margin-top: 20px; font-weight: bold; font-size: 20px;">Group:</div>
+	      		<div>
+	      			{{wishlist.group.title}}
+	      		</div>
+
+
+	      		
+
+	      		<div style="display: flex; flex-direction: row; justify-content: space-between;">
+	      			<h6 style="margin-top: 30px;">Notes:</h6>
+	      			<button class="btn btn-outline-danger" style="border-radius: 5px; height: 40px; width: 40px; margin-top: 20px;" onclick="edit_notes('{{wishlist.id}}')">
+	      				<i class="far fa-edit"></i>
+	      			</button>
+	      		</div>
+	      		
+
+	      		
+	      		<div id="{{wishlist.id}}-note" style="margin-top: 10px;">
+	      			<div id="{{wishlist.id}}-edit-note" style="margin-bottom: 20px; display: none;">
+		      			<form action="{% url 'edit_notes' wishlist.pk %}" method="post">
+							{% csrf_token %}
+							
+							<textarea name="message" class="form-control message" id="{{wishlist.id}}-textarea" rows="3" placeholder="Write a message" style="margin-bottom: 20px">{{wishlist.note}}</textarea>
+
+
+							<input class="btn btn-danger" style="border-radius: 10px;" type="submit" value="Confirm">
+
+
+							<button class="btn btn-outline-danger" style="border-radius: 10px;"onclick="cancel('{{wishlist.id}}')" type="button">
+							Cancel
+							</button>
+
+						</form>
+	      			</div>
+
+	      			<div id="{{wishlist.id}}-final-note">
+	      				{% if wishlist.note == "" %}
+	      				<h6>No notes yet!</h6>
+
+		      			{% else %}
+		      			<div id="{{wishlist.id}}-value" value="{{wishlist.note}}">
+		      				{{wishlist.note}}
+		      			</div>
+		      				
+
+		      			{% endif %}
+	      			</div>
+	      			
+	      		</div>
+
+	      		<hr>
+
+	      		<div>
+	      			{% for gift in wishlist.gifts.all %}
+	      			<div class="shadow" id="{{gift.id}}-{{wishlist.group.id}}-gift-wishlist" style="border-radius: 20px; margin: 5px; margin-bottom: 10px; width: 100%; height: 100px; display: flex; flex-direction: row; justify-content: space-between; ">
+	      				
+	      				<div style="width: 100px; border-top-left-radius: 20px; border-bottom-left-radius: 20px;">
+	      					<img src="{{gift.image_url}}" style="width: 100px; height: 100px; border-top-left-radius: 20px; border-bottom-left-radius: 20px ">
+
+	      				</div>
+
+	      				<div style="width: 100%; padding: 20px; display: flex; flex-direction: column; justify-content: center; text-align: center; align-content:center; border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
+	      					<h6 style="color: grey">
+	      						{{gift.title}}
+	      					</h6>
+	      					<h5>
+	      						$ {{gift.price}}
+	      					</h5>
+	      					
+	      				</div>
+
+	      				<div style="border-bottom-right-radius: 20px; border-top-right-radius: 20px; padding: 5px; padding-right: 10px;">
+	      					
+	      					<h6 style="cursor: pointer;" onclick="delete_panel('{{gift.id}}','{{wishlist.group.id}}')">
+	      						&times;
+	      					</h6>
+	      				</div>
+
+
+	      			</div>
+	      			{% endfor %}
+
+
+	      		</div>
+
+	      	</div>
+	      	
+
+	      {% endfor %}
+	     {% endif %}
+
+	     {% if unshuff|length > 0 %}
+	     <h5 style="color: #DC3545; font-weight: bold; margin-top: 30px">Groups not shuffled</h5>
+	     {% for group in groups %}
+	     	{% if not group.shuffled %}
+
+	     		{{group.title}} 
+
+	     	{% endif %}
+	     {% endfor %}
+	     {% endif %}
+	   </div>
+	</div>
+
+	</div>
+
+	
+
+	{% elif groups|length == 0 %}
+	<div id="no_group"style="display: flex; flex-direction: column; justify-content: center; min-height: 500px; align-content: center; margin-bottom: 50px;">
+			<div style="display: flex; flex-direction: column; justify-content: center; text-align: center;">
+				
+				<h5>
+					You need to be in a group in order to start creating your wishlist!
+				</h5>
+
+
+				<h5>
+					Click <a href="{% url 'choose' %}" class="text-danger" style="text-decoration: none;">here</a> or the generator tab to create your group! 
+				</h5>
+			</div>
+			<div style="display: flex; justify-content: center;">
+				<div  style="height: 500px; width: 45%; margin-bottom: 0px ">
+				{% include "secretsanta/christmastree.html" %}
+				</div>
+			</div>
+			
+			
+		</div>
+
+
+	{% endif %}
+	</div>
+	{% block script %}
+		
+    	
+    	<script src="{% static 'secretsanta/browse.js' %}"></script>
+    	
+
+{% endblock %}
+    
+
+
+
+
+
+{% endblock %}
+

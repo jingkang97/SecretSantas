@@ -1,0 +1,92 @@
+{% extends "secretsanta/layout.html" %}
+
+
+{% block body %}
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+   
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    
+    <div id="landing_page">
+        
+   
+    <div style="display: flex; flex-direction: row; top: 10px;">
+        <div style="height:50px; width:5000px; margin-bottom: 50px;">
+        {% include "secretsanta/decoration-top.html" %}
+    </div>
+    
+    </div>
+    <div style="display: flex; justify-content: center; padding: 20px;">
+        <div style="margin: 5px;"><h3>Welcome to Secret Santas</h3></div>
+        <div style="margin: 5px;"><i class="fas fa-gifts fa-2x" style="color: #FF2E2E;-webkit-text-stroke-width: 1px;-webkit-text-stroke-color: white;"></i></div>
+        
+    </div>
+
+
+    <div style="display:flex; justify-content: center;">
+       <div style="height: 400px; width: 400px;">
+            
+            {% include "secretsanta/stocking.html" %}
+
+        </div> 
+    </div>
+     {% if user.is_authenticated %}
+
+     {% else %}
+    <div style="display: flex; justify-content: center;">
+        
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div><h5>Haven't register/login? Click the links below!</h5></div>
+            <div style="display: flex; flex-direction: row; ">
+                <div style="margin: 10px;"><a href="{% url 'register' %}" class="btn btn-danger">Register</a></div>
+                <div style="margin: 10px;"><a href="{% url 'login' %}" class="btn btn-light">Login</a></div>
+            </div>
+            
+        </div>
+        
+    </div>
+    {% endif %}
+    <div style="margin-top: 50px; margin-bottom: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h3>More about us and how it works</h3>
+        <div id="more_about" >
+            <div id = "started">
+
+                <h5>How did it start?</h5> 
+                {% include "secretsanta/about.html" %}
+                <p id="d1">
+                    A group of people would put their names into a box and then secretly pick a name out of the box. They would buy a gift for the person they drew.
+
+                    Why organize your Secret Santa online?
+                    When family members and friends live far apart, the hat process can become tricky. This is why SecretSantas offers a free online Secret Santa generator
+
+                </p>
+            </div>
+            <div id ="rules" >
+                <h5>Rules</h5> 
+                {% include "secretsanta/rules.html" %}
+                <p id="d2 ">
+                    There must be at least 3 people in the group. All users must be registered to create groups or be added to them.
+                    There will be one organizer. The organizer enters every member’s name and then use the Secret Santa generator to shuffle the names.
+                    Each member of the group will then receive their giftee.
+                    They can then makes their own wish list and add extra notes for their secret santas.
+
+                </p>
+            </div>
+
+        </div>
+    </div>
+    
+     </div>
+    
+    
+
+    
+
+{% endblock %}

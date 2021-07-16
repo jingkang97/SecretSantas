@@ -1,0 +1,196 @@
+{% extends "secretsanta/layout.html" %}
+
+{% load static %}
+
+{% block body %}
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+   
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+	{% if alerts %}
+		{% for alert in alerts %}
+			{% if not alert.read %}
+			<div class="alert alert-warning alert-dismissible fade show" role="alert">
+			  <strong>{{alert.message}}</strong> 
+			  <button onclick="read('{{alert.id}}')" type="button" class="close read" data-dismiss="alert" aria-label="Close">
+			    <span aria-hidden="true">&times;</span>
+			  </button>
+			</div>
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+	<div style="padding-left: 30px; padding-right: 30px; padding-top: 30px; margin-bottom: 20px">
+		<h1>Groups</h1>
+		</div>
+
+	<div id="all_groups"style="padding:30px; ">
+	
+	{% if fil %}
+	<ul style="list-style-type:none; padding-left: 0;">
+
+		{% for group in groups %}
+			{% if user in group.members.all %}
+			<li style="margin-bottom:40px;">
+			<div id = "container" class="shadow" style="background-color: white; background-size: 420px 500px; background-position: right; background-repeat: no-repeat; padding:30px;  border-radius: 20px; background-image: url('{% static "secretsanta/OBJECTS@4x (2).svg" %}'); ">
+				
+				<div style="display: flex; flex-direction: row; justify-content:space-between;">
+					<h3>
+						{{group.title}}
+					</h3>
+					{% if group.organiser == user%}
+					<button type="button" class="btn btn-danger" style="border-radius: 100px; height: 40px; width: 40px; margin-right:15px; display: flex; justify-content: center; align-items: center; padding-top: 10px"  
+					onclick="location.href='{% url 'delete_group' group.pk %}'"
+					>
+						<h3>
+							&times;
+						</h3>
+						
+					</button>
+					{% endif %}
+				</div>
+					
+				
+				
+				<div>
+					<h5>
+						Organised by {{group.organiser.username}}
+					</h5>
+					
+				</div>
+				<div>
+					
+				</div>
+				
+
+				{% if group.shuffled %}
+				<span name="mem" class="badge badge-pill badge-danger mem-edit" style="padding: 5px;">
+					
+					SHUFFLED
+					
+				</span>
+
+				{% else %}
+				<span name="mem" class="badge badge-pill badge-secondary mem-edit" style="padding: 5px;">
+				
+				NOT SHUFFLED
+					
+				</span>
+				{% endif %}
+
+				{% if group.members.all|length < 3 %}
+				<span name="mem" class="badge badge-pill badge-warning mem-edit" style="padding: 5px;">
+				
+				NOT ENOUGH MEMBERS
+					
+				</span>
+				{% else %}
+				
+				{% endif %}
+
+				<br>
+				<br>
+				<div style="color:grey;">
+					{{group.note}}
+				</div>
+
+				<br>
+				<br>
+
+			<div style="display: flex; justify-content: space-between; align-content: center;">
+				<div style="display:flex; flex-direction: ltr; margin-bottom: 10px">
+				{% if group.members.all|length > 2 %}
+					{% for member in group.members.all|slice:":3" %}
+						<div class="bg-danger text-white" style="border: 2px solid white; text-align: center; border-radius: 100px; height: 40px; width: 40px; padding-top: 6px; background-color: #D9534E; margin-right: -7px; color:white;">
+							{{member.username|first|capfirst}}
+						</div>
+						
+
+					{% endfor %}
+					<div>
+						{% if group.members.all|length > 3 %}
+						<div class="bg-danger text-white" style="border: 2px solid white; text-align: center; border-radius: 100px; height: 40px; width: 40px; padding-top: 6px; background-color: #D9534E; margin-right: -7px; color:white;">
+							
+							+ {{group.members.all|length|add:"-3"}} 
+							</div>
+						{% endif %}
+					</div>
+				{% elif group.members.all|length == 2 %}
+					{% for member in group.members.all|slice:":2" %}
+						<div class="bg-danger text-white" style="border: 2px solid white; text-align: center; border-radius: 100px; height: 40px; width: 40px; padding-top: 6px; background-color: #D9534E; margin-right: -7px; color:white; ">
+							{{member.username|first|capfirst}}
+						</div>
+						
+
+					{% endfor %}
+
+				{% else %}
+					{% for member in group.members.all|slice:":1" %}
+						<div class="bg-danger text-white" style="border: 2px solid white; text-align: center; border-radius: 100px; height: 40px; width: 40px; padding-top: 6px; background-color: #D9534E; margin-right: -7px; color:white;">
+							{{member.username|first|capfirst}}
+						</div>
+						
+
+					{% endfor %}	
+
+				{% endif %}
+				</div>
+				<div style="margin-bottom: 5px">
+					<a href="{% url 'group' group.pk %}" class="bg-danger text-white" style="color: black; padding: 10px; background-color:#D9534E; color: white; border-radius: 10px; margin-right: 10px; text-decoration: none;">
+						More Info	
+					</a>
+				</div>
+			</div>
+			
+			
+
+			
+			</div>
+			</li>
+			
+
+
+			{% endif %}
+
+
+		{% endfor %}
+
+	</ul>
+	{% else %}
+		<div id="groups_page" style="display: flex; flex-direction: column; justify-content: center; min-height: 400px; align-content: center;">
+			<div style="display: flex; flex-direction: column; justify-content: center; text-align: center;">
+				<h5>
+					No groups formed yet or no one added you to their group.
+				</h5> 
+				<h5>
+					Click <a href="{% url 'choose' %}" class="text-danger" style="text-decoration: none;">here</a> or the generator tab to create your group! 
+				</h5>
+			</div>
+			<div style="display: flex; justify-content: center;">
+				<div  style="height: 500px; width: 50%; margin-bottom: 0px ">
+				{% include "secretsanta/nogroup.html" %}
+				</div>
+			</div>
+			
+			
+		</div>
+		
+			
+			
+		
+	{% endif %}
+	</div>
+	{% block script %}
+		
+    	<script src="{% static 'secretsanta/alert.js' %}"></script>
+	{% endblock %}
+
+
+
+{% endblock %}

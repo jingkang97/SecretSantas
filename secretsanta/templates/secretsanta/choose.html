@@ -1,0 +1,160 @@
+{% extends "secretsanta/layout.html" %}
+
+{% load static %}
+
+{% block body %}
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+   
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+
+	<div id="choose_page" >
+		
+		<form action="{% url 'choose' %}" method="post">
+			{% csrf_token %}
+
+
+		<div id = "santa_list"style="display: flex; flex-direction: column; align-content: flex-start; margin-right: 50px;">
+			<h1>Secret Santas Generator</h1>
+			<div style="display: inline-flex; margin-bottom: 20px;"><button type="button" class="btn btn-outline-danger" data-toggle="collapse" 
+				data-target="#container" aria-expanded="true" aria-controls="container"
+
+				style="height: 40px; width: 40px;border-radius: 100px; margin-right: 10px;"><div style="display: flex; justify-content:center; align-content: center;">1</div> </button><h3>Add your name into the box!</h3></div>
+				
+			<div id="container" style="margin-left: 19px; padding-left: 35px; border-left: 2px #DC3545 solid; margin-bottom: 20px;" class="collapse show">
+				<h5> Your name </h5>
+
+				<input style = "margin-bottom: 10px;" name="input" type="text" class="form-control names" placeholder="Enter member" disabled='disabled' value={{user.username}} aria-label="" aria-describedby="basic-addon1">
+				
+
+				<h5> Draw names with </h5>
+
+
+
+				<input style = "margin-bottom: 10px;" name="input" type="text" class="form-control names" placeholder="Enter member" aria-label="" aria-describedby="basic-addon1">
+
+				<input style = "margin-bottom: 10px;" name="input" type="text" class="form-control names" placeholder="Enter member" aria-label="" aria-describedby="basic-addon1">
+
+
+				<div id="name_list" >
+					<div class="input-group mb-3">
+				  		<input name="input" type="text" class="form-control names" placeholder="Enter member" aria-label="Enter member" aria-describedby="basic-addon2">
+				  		<div class="input-group-append">
+				    		<button class="btn btn-outline-secondary" type="button" onclick="return this.parentNode.parentNode.remove()">Remove</button>
+				  		</div>
+					</div>
+				</div>
+				
+				<div style = "margin-top: 10px;" class="input-group-prepend">
+				    <button id = "addButton" style = "border-radius: 10px;" class="btn btn-danger" type="button">Add more names</button>
+				 </div>
+
+				 <div style="margin-top:10px; marginbottom:10px">
+				 	<p>
+				 		<h5>Later you can:</h5>
+				 	</p>
+				 	<p>
+				 		<h6>
+				 			- add more people to group
+				 		</h6>
+				 		<h6>
+				 			- remove someone who isn't taking part
+				 		</h6>
+				 		
+				 	</p>
+				 </div>
+
+				 <div style = "margin-top: 10px; " class="input-group-prepend">
+				    <button class="btn btn-danger" style="border-radius: 10px;" type="button"
+
+				    data-toggle="collapse" data-target="#container_2" 
+				    aria-expanded = "false" aria-controls="container_2"
+
+				    >Next Step</button>
+				 </div>
+			</div>
+			
+		
+
+			<div style="margin-bottom: 50px; "> 
+
+				<div style="display: inline-flex;"><button type="button" class="btn btn-outline-danger" 
+					data-toggle="collapse" data-target="#container_2" 
+				    aria-expanded = "false" aria-controls="container_2"
+
+					style="height: 40px; width: 40px;border-radius: 100px; margin-right: 10px;"><div style="display: flex; justify-content:center; align-content: center;">2</div> </button><h3>Set up gift exchange details</h3></div>
+				<div id = "container_2" class="collapse" >
+					
+				
+				
+
+				<div style="padding-left: 60px; padding-top: 10px">
+					<h5> Group name </h5>
+
+					<input name = "group_name" style = "margin-bottom: 10px;" type="text" class="form-control group-name" placeholder="Enter name" aria-label="" aria-describedby="basic-addon1">
+
+
+					<h5>Date of gift exchange</h5>
+
+
+					<div style="margin-bottom: 10px">
+					  <input name="date" type="date" class="form-control exchange-date" id="datepicker" placeholder="MM/DD/YYYY" style="cursor:pointer" >
+					</div>
+
+
+					<h5> Budget </h5>
+
+					<div class="input-group mb-3">
+  						<div class="input-group-prepend">
+    						<span class="input-group-text">$</span>
+  						</div>
+  						<input name="budget" type="number" step=".01" class="form-control budget" aria-label="Amount (to the nearest dollar)">
+  
+						</div>
+
+
+					<h5>Message</h5>
+					
+					<textarea name="message" class="form-control message" id="exampleFormControlTextarea1" rows="3" placeholder="Write a message" style="margin-bottom: 20px"></textarea>
+
+					
+					
+				 	
+					
+
+				 	<div style = "margin-top: 30px; " class="input-group-prepend">
+
+				 	<input class="btn btn-danger" style="border-radius: 10px;" type="submit" value="Confirm">
+
+				    
+				 	</div>
+
+					</div>
+				</div>
+
+				</div>
+
+			
+
+		</div>
+		</form>
+		<div id = "box">
+			{% include "secretsanta/box.html" %}
+		</div>
+	</div>
+
+	{% block script %}
+		<!-- <script type="text/javascript">
+			$('#datepicker').datepicker();
+		</script> -->
+    	<script src="{% static 'secretsanta/santas.js' %}"></script>
+	{% endblock %}
+{% endblock %}
+
